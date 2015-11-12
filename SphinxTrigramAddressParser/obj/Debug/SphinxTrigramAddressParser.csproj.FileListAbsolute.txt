@@ -1,0 +1,9 @@
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\bin\Debug\SphinxTrigramAddressParser.exe.config
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\bin\Debug\SphinxTrigramAddressParser.exe
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\bin\Debug\SphinxTrigramAddressParser.pdb
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\obj\Debug\SphinxTrigramAddressParser.csprojResolveAssemblyReference.cache
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\obj\Debug\SphinxTrigramAddressParser.exe
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\obj\Debug\SphinxTrigramAddressParser.pdb
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\bin\Debug\MySql.Data.dll
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\bin\Debug\DataTypes.dll
+D:\Projects\Visual Studio Projects\SphinxTrigramAddressParser\SphinxTrigramAddressParser\bin\Debug\gudusoft.gsqlparser.dll
