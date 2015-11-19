@@ -35,16 +35,16 @@ namespace SphinxTrigramAddressParser
 
         public static string NormalizePremises(string premises)
         {
-            return premises.Replace("квартира.", ",").Replace("квартира", ",").Replace("кв.ком.", ",").Replace("кв.ком", ",")
+            return Regex.Replace(premises.Replace("квартира.", ",").Replace("квартира", ",").Replace("кв.ком.", ",").Replace("кв.ком", ",")
                 .Replace("квком.", ",").Replace("квком", ",")
-                .Replace("кв.", ",").Replace("кв", ",").Replace("-", ",").Replace(" ", "").Replace(",,", ",").Trim(',').ToUpper();
+                .Replace("кв.", ",").Replace("кв", ",").Replace("-", ",").Replace(" ", "").Replace(",,", ",").Trim(','),"[,]?[зЗ]$","").ToUpper();
         }
 
         public static string NormalizeSubPremises(string subPremises)
         {
-            return Regex.Replace(subPremises, @"км[0-9]+[ ]*з?\.?$",",") /*убираем койко-место*/
+            return Regex.Replace(Regex.Replace(subPremises, @"км[0-9]+[ ]*з?\.?$",",") /*убираем койко-место*/
                 .Replace("комната.", ",").Replace("комната", ",").Replace("ком.", ",").Replace("ком", ",")
-                .Replace("к.", ",").Replace("к", ",").Replace(" ", "").Replace("\\", "/").Replace(",,", ",").Trim(',').ToUpper();
+                .Replace("к.", ",").Replace("к", ",").Replace(" ", "").Replace("\\", "/").Replace(",,", ",").Trim(','),@"[зЗ]$", "").ToUpper();
         }
 
         public static bool IsValidAddress(IReadOnlyList<List<Premise>> address)

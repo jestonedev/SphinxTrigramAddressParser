@@ -26,7 +26,7 @@ namespace SphinxTrigramAddressParser
             foreach (var address in preparedPremises)
             {
                 var validPremisesLists = AddressHelper.GetValidPremisesLists(address);
-                if (validPremisesLists != null && validPremisesLists.Count == 1)
+                if (validPremisesLists != null && validPremisesLists.Count > 0)
                 {
                     InsertIntoDbTable("_prevalid", validPremisesLists.First());
                     Logger.Write(string.Format("Insert valid address `{0}`", validPremisesLists.First().First().RawAddress),
