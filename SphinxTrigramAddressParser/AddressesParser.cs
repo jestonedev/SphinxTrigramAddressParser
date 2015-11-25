@@ -33,12 +33,11 @@ namespace SphinxTrigramAddressParser
             var matches = Regex.Match(premiseAddress.RawAddress.ToLower(), regExpression);
             if (matches.Length < 4)
             {
+                var copyPremise = PartialCopyPremise(premiseAddress);
+                copyPremise.Description = "Invalid parse address";
                 var emptyAddress = new List<List<Premise>>
                 {
-                    new List<Premise> {new Premise {
-                        RawAddress = premiseAddress.RawAddress, 
-                        Account = premiseAddress.Account,
-                        Description = "Invalid parse address"}}
+                    new List<Premise> {copyPremise}
                 };
                 return new List<List<Premise>>(emptyAddress);
             }
@@ -60,30 +59,22 @@ namespace SphinxTrigramAddressParser
             var addresses = new List<List<Premise>>();
             if (string.IsNullOrEmpty(subPremises))
             {
-                var newAddress = new Premise
-                {
-                    RawAddress = premiseAddress.RawAddress,
-                    Account = premiseAddress.Account,
-                    Street = street,
-                    House = house,
-                    PremiseNumber = premises,
-                    SubPremises = new List<SubPremise>()
-                };
+                var newAddress = PartialCopyPremise(premiseAddress);
+                newAddress.SubPremises = new List<SubPremise>();
+                newAddress.PremiseNumber = premises;
+                newAddress.House = house;
+                newAddress.Street = street;
                 addresses.Add(new List<Premise> { newAddress });
                 var premisesArray = premises.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if (premisesArray.Length <= 1) return addresses;
                 var newAddressesList = new List<Premise>();
                 foreach (var premise in premisesArray)
                 {
-                    newAddress = new Premise
-                    {
-                        RawAddress = premiseAddress.RawAddress,
-                        Account = premiseAddress.Account,
-                        Street = street,
-                        House = house,
-                        PremiseNumber = premise,
-                        SubPremises = new List<SubPremise>()
-                    };
+                    newAddress = PartialCopyPremise(premiseAddress);
+                    newAddress.SubPremises = new List<SubPremise>();
+                    newAddress.PremiseNumber = premise;
+                    newAddress.House = house;
+                    newAddress.Street = street;
                     newAddressesList.Add(newAddress);
                 }
                 addresses.Add(newAddressesList);
@@ -93,53 +84,71 @@ namespace SphinxTrigramAddressParser
                 var subPremisesList = subPremises.Split(new[] { ',' }, 2);
                 if (sleshedRooms)
                 {
-                    var newConcatedPremiseSubpremise = new Premise
-                    {
-                        RawAddress = premiseAddress.RawAddress,
-                        Account = premiseAddress.Account,
-                        Street = street,
-                        House = house,
-                        PremiseNumber = premises + "," + subPremisesList[0],
-                        SubPremises = subPremisesList.Count() == 2 ? subPremisesList[1].Split(',').
-                            Select(subPremise => new SubPremise { SubPremiseNumber = subPremise }).ToList() : new List<SubPremise>()
-                    };
+                    var newConcatedPremiseSubpremise = PartialCopyPremise(premiseAddress);
+                    newConcatedPremiseSubpremise.Street = street;
+                    newConcatedPremiseSubpremise.House = house;
+                    newConcatedPremiseSubpremise.PremiseNumber = premises + "," + subPremisesList[0];
+                    newConcatedPremiseSubpremise.SubPremises = subPremisesList.Count() == 2
+                        ? subPremisesList[1].Split(',').
+                            Select(subPremise => new SubPremise {SubPremiseNumber = subPremise}).ToList()
+                        : new List<SubPremise>();
                     addresses.Add(new List<Premise> { newConcatedPremiseSubpremise });
                 }
-                var newAddress = new Premise
-                {
-                    RawAddress = premiseAddress.RawAddress,
-                    Account = premiseAddress.Account,
-                    Street = street,
-                    House = house,
-                    PremiseNumber = premises,
-                    SubPremises = new List<SubPremise>()
-                };
+                var newAddress = PartialCopyPremise(premiseAddress);
+                newAddress.Street = street;
+                newAddress.House = house;
+                newAddress.PremiseNumber = premises;
+                newAddress.SubPremises = new List<SubPremise>();
                 var subPremisesArray = subPremises.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var subPremise in subPremisesArray)
                     newAddress.SubPremises.Add(new SubPremise { SubPremiseNumber = subPremise });
                 addresses.Add(new List<Premise> { newAddress });
-                if (sleshedRooms && (subPremisesList.Count() == 1))
+                if (sleshedRooms && (subPremisesList.Length == 1))
                 {
                     var premisesArray = (premises + "," + subPremisesList[0]).
                         Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     var newAddressesList = new List<Premise>();
                     foreach (var premise in premisesArray)
                     {
-                        newAddress = new Premise
-                        {
-                            RawAddress = premiseAddress.RawAddress,
-                            Account = premiseAddress.Account,
-                            Street = street,
-                            House = house,
-                            PremiseNumber = premise,
-                            SubPremises = new List<SubPremise>()
-                        };
+                        newAddress = PartialCopyPremise(premiseAddress);
+                        newAddress.Street = street;
+                        newAddress.House = house;
+                        newAddress.PremiseNumber = premise;
+                        newAddress.SubPremises = new List<SubPremise>();
                         newAddressesList.Add(newAddress);
                     }
                     addresses.Add(newAddressesList);
                 }
             }
             return addresses;
+        }
+
+        private static Premise PartialCopyPremise(Premise premise)
+        {
+            return new Premise
+            {
+                RawAddress = premise.RawAddress,
+                Account = premise.Account,
+                CRN = premise.CRN,
+                Tenant = premise.Tenant,
+                BalanceTenancy = premise.BalanceTenancy,
+                TotalArea = premise.TotalArea,
+                LivingArea = premise.LivingArea,
+                Prescribed = premise.Prescribed,
+                ChargingTenancy = premise.ChargingTenancy,
+                BalanceDGI = premise.BalanceDGI,
+                BalanceInput = premise.BalanceInput,
+                TransferBalance = premise.TransferBalance,
+                ChargingDGI = premise.ChargingDGI,
+                BalanceOutputTenancy = premise.BalanceOutputTenancy,
+                PaymentDGI = premise.PaymentDGI,
+                ChargingTotal = premise.ChargingTotal,
+                BalanceOutputTotal = premise.BalanceOutputTotal,
+                RecalcTenancy = premise.RecalcTenancy,
+                PaymentTenancy = premise.PaymentTenancy,
+                RecalcDGI = premise.RecalcDGI,
+                BalanceOutputDGI = premise.BalanceOutputDGI
+            };
         }
     }
 }

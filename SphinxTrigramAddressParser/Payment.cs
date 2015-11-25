@@ -13,7 +13,6 @@ namespace SphinxTrigramAddressParser
         public string House { get; set; }
         public string Premise { get; set; }
         public string SubPremise { get; set; }
-
         public bool HasZSymbol { get; set; }
         public int? IdPremises { get; set; }
     }

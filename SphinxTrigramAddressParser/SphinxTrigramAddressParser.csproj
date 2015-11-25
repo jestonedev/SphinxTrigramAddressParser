@@ -65,6 +65,7 @@
     <Compile Include="Logger.cs" />
     <Compile Include="MsgType.cs" />
     <Compile Include="Payment.cs" />
+    <Compile Include="PremiseRaw.cs" />
     <Compile Include="Premise.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

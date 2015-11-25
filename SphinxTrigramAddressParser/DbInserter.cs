@@ -75,7 +75,7 @@ namespace SphinxTrigramAddressParser
                               TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1)),
                               LOCATE(' ', TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1))))) AS street_name
                             FROM v_kladr_streets vks) x ON b.id_street = x.id_street
-                            WHERE v.rawAddress NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ');";
+                            WHERE v.raw_address NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ');";
             var errorCount = command.ExecuteNonQuery();
             Logger.Write("Copy correct resolved addresses from table _prevalid into table _valid", MsgType.InformationMsg);
             command.CommandText =
@@ -91,7 +91,7 @@ namespace SphinxTrigramAddressParser
                               TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1)),
                               LOCATE(' ', TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1))))) AS street_name
                             FROM v_kladr_streets vks) x ON b.id_street = x.id_street
-                            WHERE v.rawAddress LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ');";
+                            WHERE v.raw_address LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ');";
             command.ExecuteNonQuery();
             return errorCount;
             /* Console.ForegroundColor = ConsoleColor.Yellow;
@@ -125,7 +125,7 @@ namespace SphinxTrigramAddressParser
 
         private void InsertIntoDbTable(string tableName, List<Premise> premiseVariant)
         {
-            var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?)", tableName);
+            var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
             var command = DbConnection.CreateCommand();
             command.CommandText = query;
             foreach (var premise in premiseVariant)
@@ -146,12 +146,31 @@ namespace SphinxTrigramAddressParser
                 command.Parameters.Add(DbConnection.CreateParameter("id_premises_list", idPremisesList));
                 command.Parameters.Add(DbConnection.CreateParameter("id_premises_valid", premise.IdPremisesValid));
                 command.Parameters.Add(DbConnection.CreateParameter("id_sub_premises", idSubPremises));
-                command.Parameters.Add(DbConnection.CreateParameter("rawAddress", premise.RawAddress));
+                command.Parameters.Add(DbConnection.CreateParameter("raw_address", premise.RawAddress));
                 command.Parameters.Add(DbConnection.CreateParameter("house", premise.House));
-                command.Parameters.Add(DbConnection.CreateParameter("premiseNum", premise.PremiseNumber));
+                command.Parameters.Add(DbConnection.CreateParameter("premise_number", premise.PremiseNumber));
                 command.Parameters.Add(DbConnection.CreateParameter("subPremises", subPremises));
                 command.Parameters.Add(DbConnection.CreateParameter("account", premise.Account));
                 command.Parameters.Add(DbConnection.CreateParameter("description", premise.Description));
+                command.Parameters.Add(DbConnection.CreateParameter("crn", premise.CRN));
+                command.Parameters.Add(DbConnection.CreateParameter("tenant", premise.Tenant));
+                command.Parameters.Add(DbConnection.CreateParameter("prescribed", premise.Prescribed));
+                command.Parameters.Add(DbConnection.CreateParameter("total_area", premise.TotalArea));
+                command.Parameters.Add(DbConnection.CreateParameter("living_area", premise.LivingArea));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_input", premise.BalanceInput));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_tenancy", premise.BalanceTenancy));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_dgi", premise.BalanceDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_tenancy", premise.ChargingTenancy));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_total", premise.ChargingTotal));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_dgi", premise.ChargingDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("recalc_tenancy", premise.RecalcTenancy));
+                command.Parameters.Add(DbConnection.CreateParameter("recalc_dgi", premise.RecalcDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("payment_tenancy", premise.PaymentTenancy));
+                command.Parameters.Add(DbConnection.CreateParameter("payment_dgi", premise.PaymentDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("transfer_balance", premise.TransferBalance));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_total", premise.BalanceOutputTotal));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_tenancy", premise.BalanceOutputTenancy));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_dgi", premise.BalanceOutputDGI));
                 command.ExecuteNonQuery();
             }
             IdPremiseGroup++;
@@ -164,12 +183,31 @@ namespace SphinxTrigramAddressParser
                       "id_premises_list varchar(255) DEFAULT NULL, "+
                       "id_premises_valid varchar(255) DEFAULT NULL, " +
                       "id_sub_premises varchar(255) DEFAULT NULL, "+
-                      "rawAddress varchar(255) DEFAULT NULL, "+
+                      "raw_address varchar(255) DEFAULT NULL, "+
                       "house varchar(255) DEFAULT NULL, "+
-                      "premiseNum varchar(255) DEFAULT NULL, "+
-                      "subPremises varchar(255) DEFAULT NULL, "+
+                      "premise_number varchar(255) DEFAULT NULL, "+
+                      "sub_premises varchar(255) DEFAULT NULL, "+
                       "account varchar(255) DEFAULT NULL, "+
-                      "description varchar(255) DEFAULT NULL "+
+                      "description varchar(255) DEFAULT NULL, "+
+                      "crn varchar(255) DEFAULT NULL, " +
+                      "tenant varchar(255) DEFAULT NULL, " +
+                      "prescribed varchar(255) DEFAULT NULL, " +
+                      "total_area varchar(255) DEFAULT NULL, " +
+                      "living_area varchar(255) DEFAULT NULL, " +
+                      "balance_input varchar(255) DEFAULT NULL, " +
+                      "balance_tenancy varchar(255) DEFAULT NULL, " +
+                      "balance_dgi varchar(255) DEFAULT NULL, " +
+                      "charging_tenancy varchar(255) DEFAULT NULL, " +
+                      "charging_total varchar(255) DEFAULT NULL, " +
+                      "charging_dgi varchar(255) DEFAULT NULL, " +
+                      "recalc_tenancy varchar(255) DEFAULT NULL, " +
+                      "recalc_dgi varchar(255) DEFAULT NULL, " +
+                      "payment_tenancy varchar(255) DEFAULT NULL, " +
+                      "payment_dgi varchar(255) DEFAULT NULL, " +
+                      "transfer_balance varchar(255) DEFAULT NULL, " +
+                      "balance_output_total varchar(255) DEFAULT NULL, " +
+                      "balance_output_tenancy varchar(255) DEFAULT NULL, " +
+                      "balance_output_dgi varchar(255) DEFAULT NULL" +
                     ") "+
                     "ENGINE = INNODB "+
                     "CHARACTER SET utf8 "+
