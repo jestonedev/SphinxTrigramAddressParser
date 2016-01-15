@@ -10,12 +10,14 @@ namespace SphinxTrigramAddressParser
         private Logger Logger { get; set; }
 
         private int IdPremiseGroup { get; set; }
+        private int IdKey { get; set; }
 
         public DbInserter(DatabaseConnection dbConnection, Logger logger)
         {
             DbConnection = dbConnection;
             Logger = logger;
             IdPremiseGroup = 1;
+            IdKey = 1;
         }
 
         public void InsertIntoDb(List<List<List<Premise>>> preparedPremises, List<List<List<Premise>>> invalidPremises)
@@ -64,7 +66,11 @@ namespace SphinxTrigramAddressParser
             var command = DbConnection.CreateCommand();
             Logger.Write("Copy incorrect resolved addresses from table _prevalid into table _invalid", MsgType.InformationMsg);
             command.CommandText =
-                @"INSERT INTO _invalid SELECT v.*
+                @"INSERT INTO _invalid
+                            SELECT pr.*
+                            FROM _prevalid pr
+                            WHERE pr.account IN (
+                            SELECT v.account
                             FROM _prevalid v
                               INNER JOIN premises p ON v.id_premises_valid = p.id_premises
                               INNER JOIN buildings b ON p.id_building = b.id_building
@@ -75,23 +81,26 @@ namespace SphinxTrigramAddressParser
                               TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1)),
                               LOCATE(' ', TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1))))) AS street_name
                             FROM v_kladr_streets vks) x ON b.id_street = x.id_street
-                            WHERE v.raw_address NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ');";
+                            WHERE v.raw_address NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ'))";
             var errorCount = command.ExecuteNonQuery();
             Logger.Write("Copy correct resolved addresses from table _prevalid into table _valid", MsgType.InformationMsg);
             command.CommandText =
                 @"INSERT INTO _valid
-                            SELECT v.*
-                            FROM _prevalid v
-                              INNER JOIN premises p ON v.id_premises_valid = p.id_premises
-                              INNER JOIN buildings b ON p.id_building = b.id_building
-                              INNER JOIN 
-                            (
-                            SELECT vks.id_street,  
-                              TRIM(SUBSTRING(
-                              TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1)),
-                              LOCATE(' ', TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1))))) AS street_name
-                            FROM v_kladr_streets vks) x ON b.id_street = x.id_street
-                            WHERE v.raw_address LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ');";
+                   SELECT pr.*
+                    FROM _prevalid pr
+                    WHERE pr.account NOT IN (
+                    SELECT v.account
+                    FROM _prevalid v
+                      INNER JOIN premises p ON v.id_premises_valid = p.id_premises
+                      INNER JOIN buildings b ON p.id_building = b.id_building
+                      INNER JOIN 
+                    (
+                    SELECT vks.id_street,  
+                      TRIM(SUBSTRING(
+                      TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1)),
+                      LOCATE(' ', TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1))))) AS street_name
+                    FROM v_kladr_streets vks) x ON b.id_street = x.id_street
+                    WHERE v.raw_address NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ'))";
             command.ExecuteNonQuery();
             return errorCount;
             /* Console.ForegroundColor = ConsoleColor.Yellow;
@@ -125,11 +134,12 @@ namespace SphinxTrigramAddressParser
 
         private void InsertIntoDbTable(string tableName, List<Premise> premiseVariant)
         {
-            var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
-            var command = DbConnection.CreateCommand();
-            command.CommandText = query;
             foreach (var premise in premiseVariant)
             {
+                var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
+                var command = DbConnection.CreateCommand();
+                command.CommandText = query;
+                if (string.IsNullOrEmpty(premise.RawAddress)) continue;
                 var idPremisesList = "";
                 var idSubPremises = "";
                 var subPremises = "";
@@ -142,6 +152,7 @@ namespace SphinxTrigramAddressParser
                 idPremisesList = idPremisesList.Trim(',');
                 idSubPremises = idSubPremises.Trim(',');
                 subPremises = subPremises.Trim(',');
+                command.Parameters.Add(DbConnection.CreateParameter("id_key", IdKey));
                 command.Parameters.Add(DbConnection.CreateParameter("id_premises_group", IdPremiseGroup));
                 command.Parameters.Add(DbConnection.CreateParameter("id_premises_list", idPremisesList));
                 command.Parameters.Add(DbConnection.CreateParameter("id_premises_valid", premise.IdPremisesValid));
@@ -172,6 +183,7 @@ namespace SphinxTrigramAddressParser
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_tenancy", premise.BalanceOutputTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_dgi", premise.BalanceOutputDGI));
                 command.ExecuteNonQuery();
+                IdKey++;
             }
             IdPremiseGroup++;
         }
@@ -179,6 +191,7 @@ namespace SphinxTrigramAddressParser
         private static string CreateTableQuery(string tableName)
         {
             return string.Format("CREATE TABLE IF NOT EXISTS {0} ( " +
+                      "id_key int NOT NULL, " +
                       "id_premises_group INT DEFAULT NULL, " +
                       "id_premises_list varchar(255) DEFAULT NULL, "+
                       "id_premises_valid varchar(255) DEFAULT NULL, " +
@@ -207,7 +220,8 @@ namespace SphinxTrigramAddressParser
                       "transfer_balance varchar(255) DEFAULT NULL, " +
                       "balance_output_total varchar(255) DEFAULT NULL, " +
                       "balance_output_tenancy varchar(255) DEFAULT NULL, " +
-                      "balance_output_dgi varchar(255) DEFAULT NULL" +
+                      "balance_output_dgi varchar(255) DEFAULT NULL " +
+                      "" +
                     ") "+
                     "ENGINE = INNODB "+
                     "CHARACTER SET utf8 "+

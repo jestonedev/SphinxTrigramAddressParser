@@ -187,20 +187,19 @@ namespace SphinxTrigramAddressParser
             foreach (var row in tableJoin.Rows)
             {
                 premises.Add(new PremiseRaw
-                {                  
-                    CRN = row.Cells[0].Value.AsString().Value(),
-                    Account = row.Cells[2].Value.AsString().Value(),
-                    Tenant = row.Cells[3].Value.AsString().Value(),
-                    RawAddress = row.Cells[4].Value.AsString().Value(),
-                    RawType = row.Cells[8].Value.AsString().Value(),
-                    TotalArea = row.Cells[9].Value.AsString().Value(),
-                    LivingArea = row.Cells[10].Value.AsString().Value(),
-                    Prescribed = row.Cells[11].Value.AsString().Value(),
-                    BalanceInput = row.Cells[12].Value.AsString().Value(),
-                    BalanceTenancy = row.Cells[15].Value.AsString().Value(),
-
-                    DebetDGI = row.Cells[16].Value.AsString().Value(),      // sept 17
-                    BalanceOutput = row.Cells[17].Value.AsString().Value(),  // sept 18
+                {
+                    CRN = row.Cells[0].Value.AsString().Value(),            // feb, mar, apr, may, jun, jul, aug, sept, oct 0, nov 0
+                    Account = row.Cells[2].Value.AsString().Value(),        // feb, mar, apr, may, jun 2, jul 1, aug, sept, oct 2, nov 0
+                    Tenant = row.Cells[3].Value.AsString().Value(),         // feb, mar, apr, may, jun 3, jul 2, aug, sept, oct 3, nov 0
+                    RawAddress = row.Cells[4].Value.AsString().Value(),     // feb, mar, apr, may, jun 4, jul 3, aug, sept, oct 4, nov 0
+                    RawType = row.Cells[6].Value.AsString().Value(),        // feb 7, mar, apr 8, may, jun 6, jul 5, aug, sept, oct 8, nov 6
+                    TotalArea = row.Cells[7].Value.AsString().Value(),      // feb 8, mar, apr 9, may, jun 7, jul 6, aug, sept, oct 9, nov 7
+                    LivingArea = row.Cells[8].Value.AsString().Value(),     // feb 9, mar, apr 10, may, jun 8, jul 7, aug, sept, oct 10, nov 8
+                    Prescribed = row.Cells[9].Value.AsString().Value(),    // feb 10, mar, apr 11, may, jun 9, jul 8, aug, sept, oct 11, nov 9
+                    BalanceInput = row.Cells[10].Value.AsString().Value(),  // feb 11,  mar, apr 12, may, jun 10, jul 9, aug, sept, oct 12, nov 10
+                    BalanceTenancy = row.Cells[13].Value.AsString().Value(),// feb 12, mar, apr 13, may 11, jun 13, jul 10, aug, sept, oct 15, nov 13
+                    DebetDGI = row.Cells[15].Value.AsString().Value(),      // feb, mar empty, apr 15, may 13, jun 15, jul 12, aug, sept 17, oct 18, nov 15
+                    BalanceOutput = row.Cells[16].Value.AsString().Value(), // feb 14, mar 15, apr 16, may 14, jun 16, jul 13, aug, sept 18, oct 19, nov 16
                 });
             }
             return premises;

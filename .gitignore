@@ -1,0 +1,17 @@
+*.suo
+*.user
+*.userosscache
+[Dd]ebug/
+[Oo]bj/
+*.user
+*.bak
+[Tt]humbs.db
+/SphinxTrigramAddressParser/payments_apr.csv
+/SphinxTrigramAddressParser/payments_aug.csv
+/SphinxTrigramAddressParser/payments_feb.csv
+/SphinxTrigramAddressParser/payments_jul.csv
+/SphinxTrigramAddressParser/payments_jun.csv
+/SphinxTrigramAddressParser/payments_mar.csv
+/SphinxTrigramAddressParser/payments_may.csv
+/SphinxTrigramAddressParser/payments_may2.csv
+/SphinxTrigramAddressParser/payments_nov.csv
