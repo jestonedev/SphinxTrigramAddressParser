@@ -136,7 +136,7 @@ namespace SphinxTrigramAddressParser
         {
             foreach (var premise in premiseVariant)
             {
-                var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
+                var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
                 var command = DbConnection.CreateCommand();
                 command.CommandText = query;
                 if (string.IsNullOrEmpty(premise.RawAddress)) continue;
@@ -171,17 +171,22 @@ namespace SphinxTrigramAddressParser
                 command.Parameters.Add(DbConnection.CreateParameter("balance_input", premise.BalanceInput));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_tenancy", premise.BalanceTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_dgi", premise.BalanceDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_input_penalties", premise.BalanceInputPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("charging_tenancy", premise.ChargingTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("charging_total", premise.ChargingTotal));
                 command.Parameters.Add(DbConnection.CreateParameter("charging_dgi", premise.ChargingDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_penalties", premise.ChargingPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("recalc_tenancy", premise.RecalcTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("recalc_dgi", premise.RecalcDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("recalc_penalties", premise.RecalcPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("payment_tenancy", premise.PaymentTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("payment_dgi", premise.PaymentDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("payment_penalties", premise.PaymentPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("transfer_balance", premise.TransferBalance));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_total", premise.BalanceOutputTotal));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_tenancy", premise.BalanceOutputTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_dgi", premise.BalanceOutputDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_penalties", premise.BalanceOutputPenalties));
                 command.ExecuteNonQuery();
                 IdKey++;
             }
@@ -210,18 +215,22 @@ namespace SphinxTrigramAddressParser
                       "balance_input varchar(255) DEFAULT NULL, " +
                       "balance_tenancy varchar(255) DEFAULT NULL, " +
                       "balance_dgi varchar(255) DEFAULT NULL, " +
+                      "balance_input_penalties varchar(255) DEFAULT NULL, " +
                       "charging_tenancy varchar(255) DEFAULT NULL, " +
                       "charging_total varchar(255) DEFAULT NULL, " +
                       "charging_dgi varchar(255) DEFAULT NULL, " +
+                      "charging_penalties varchar(255) DEFAULT NULL, " +
                       "recalc_tenancy varchar(255) DEFAULT NULL, " +
                       "recalc_dgi varchar(255) DEFAULT NULL, " +
+                      "recalc_penalties varchar(255) DEFAULT NULL, " +
                       "payment_tenancy varchar(255) DEFAULT NULL, " +
                       "payment_dgi varchar(255) DEFAULT NULL, " +
+                      "payment_penalties varchar(255) DEFAULT NULL, " +
                       "transfer_balance varchar(255) DEFAULT NULL, " +
                       "balance_output_total varchar(255) DEFAULT NULL, " +
                       "balance_output_tenancy varchar(255) DEFAULT NULL, " +
-                      "balance_output_dgi varchar(255) DEFAULT NULL " +
-                      "" +
+                      "balance_output_dgi varchar(255) DEFAULT NULL, " +
+                      "balance_output_penalties varchar(255) DEFAULT NULL" +
                     ") "+
                     "ENGINE = INNODB "+
                     "CHARACTER SET utf8 "+

@@ -65,22 +65,26 @@ namespace SphinxTrigramAddressParser
                         premise.BalanceInput = balanceInputFirst.BalanceInput;
                         premise.BalanceTenancy = balanceInputFirst.BalanceTenancy;
                         premise.BalanceDGI = balanceInputFirst.DebetDGI;
+                        premise.BalanceInputPenalties = balanceInputFirst.Penalties;
                     }
                     else
                     {
                         premise.BalanceInput = "0";
                         premise.BalanceTenancy = "0";
                         premise.BalanceDGI = "0";
+                        premise.BalanceInputPenalties = "0";
                     }
                     var charging = group.Steps.Where(s => s.RawType == "Начислено (расчет)").ToList();
                     if (charging.Any())
                     {
                         var chargingFirst = charging.First();
+                        premise.ChargingPenalties = chargingFirst.Penalties;
                         premise.ChargingTenancy = chargingFirst.BalanceTenancy;
                     }
                     else
                     {
                         premise.ChargingTenancy = "0";
+                        premise.ChargingPenalties = "0";
                     }
                     var chargingTotal = group.Steps.Where(s => s.RawType == "Начислено (итого)").ToList();
                     if (chargingTotal.Any())
@@ -100,11 +104,13 @@ namespace SphinxTrigramAddressParser
                         var recalcFirst = recalc.First();
                         premise.RecalcTenancy = recalcFirst.BalanceTenancy;
                         premise.RecalcDGI = recalcFirst.DebetDGI;
+                        premise.RecalcPenalties = recalcFirst.Penalties;
                     }
                     else
                     {
                         premise.RecalcTenancy = "0";
                         premise.RecalcDGI = "0";
+                        premise.RecalcPenalties = "0";
                     }
                     var payment = group.Steps.Where(s => s.RawType == "Оплачено").ToList();
                     if (payment.Any())
@@ -112,11 +118,13 @@ namespace SphinxTrigramAddressParser
                         var paymentFirst = payment.First();
                         premise.PaymentTenancy = paymentFirst.BalanceTenancy;
                         premise.PaymentDGI = paymentFirst.DebetDGI;
+                        premise.PaymentPenalties = paymentFirst.Penalties;
                     }
                     else
                     {
                         premise.PaymentTenancy = "0";
                         premise.PaymentDGI = "0";
+                        premise.PaymentPenalties = "0";
                     }
                     var transferBalance = group.Steps.Where(s => s.RawType == "Перенос сальдо").ToList();
                     if (transferBalance.Any())
@@ -136,12 +144,14 @@ namespace SphinxTrigramAddressParser
                         premise.BalanceOutputTotal = balanceOutputFirst.BalanceOutput;
                         premise.BalanceOutputTenancy = balanceOutputFirst.BalanceTenancy;
                         premise.BalanceOutputDGI = balanceOutputFirst.DebetDGI;
+                        premise.BalanceOutputPenalties = balanceOutputFirst.Penalties;
                     }
                     else
                     {
                         premise.BalanceOutputTotal = "0";
                         premise.BalanceOutputTenancy = "0";
                         premise.BalanceOutputDGI = "0";
+                        premise.BalanceOutputPenalties = "0";
                     }
                     premises.Add(premise);
                     premise = new Premise();
@@ -189,17 +199,18 @@ namespace SphinxTrigramAddressParser
                 premises.Add(new PremiseRaw
                 {
                     CRN = row.Cells[0].Value.AsString().Value(),            // feb, mar, apr, may, jun, jul, aug, sept, oct 0, nov 0
-                    Account = row.Cells[2].Value.AsString().Value(),        // feb, mar, apr, may, jun 2, jul 1, aug, sept, oct 2, nov 0
-                    Tenant = row.Cells[3].Value.AsString().Value(),         // feb, mar, apr, may, jun 3, jul 2, aug, sept, oct 3, nov 0
-                    RawAddress = row.Cells[4].Value.AsString().Value(),     // feb, mar, apr, may, jun 4, jul 3, aug, sept, oct 4, nov 0
-                    RawType = row.Cells[6].Value.AsString().Value(),        // feb 7, mar, apr 8, may, jun 6, jul 5, aug, sept, oct 8, nov 6
-                    TotalArea = row.Cells[7].Value.AsString().Value(),      // feb 8, mar, apr 9, may, jun 7, jul 6, aug, sept, oct 9, nov 7
-                    LivingArea = row.Cells[8].Value.AsString().Value(),     // feb 9, mar, apr 10, may, jun 8, jul 7, aug, sept, oct 10, nov 8
-                    Prescribed = row.Cells[9].Value.AsString().Value(),    // feb 10, mar, apr 11, may, jun 9, jul 8, aug, sept, oct 11, nov 9
-                    BalanceInput = row.Cells[10].Value.AsString().Value(),  // feb 11,  mar, apr 12, may, jun 10, jul 9, aug, sept, oct 12, nov 10
-                    BalanceTenancy = row.Cells[13].Value.AsString().Value(),// feb 12, mar, apr 13, may 11, jun 13, jul 10, aug, sept, oct 15, nov 13
-                    DebetDGI = row.Cells[15].Value.AsString().Value(),      // feb, mar empty, apr 15, may 13, jun 15, jul 12, aug, sept 17, oct 18, nov 15
-                    BalanceOutput = row.Cells[16].Value.AsString().Value(), // feb 14, mar 15, apr 16, may 14, jun 16, jul 13, aug, sept 18, oct 19, nov 16
+                    Account = row.Cells[1].Value.AsString().Value(),        // feb, mar, apr, may, jun 2, jul 1, aug, sept, oct 2, nov 0
+                    Tenant = row.Cells[2].Value.AsString().Value(),         // feb, mar, apr, may, jun 3, jul 2, aug, sept, oct 3, nov 0
+                    RawAddress = row.Cells[3].Value.AsString().Value(),     // feb, mar, apr, may, jun 4, jul 3, aug, sept, oct 4, nov 0
+                    RawType = row.Cells[4].Value.AsString().Value(),        // feb 7, mar, apr 8, may, jun 6, jul 5, aug, sept, oct 8, nov 6
+                    TotalArea = row.Cells[5].Value.AsString().Value(),      // feb 8, mar, apr 9, may, jun 7, jul 6, aug, sept, oct 9, nov 7
+                    LivingArea = row.Cells[6].Value.AsString().Value(),     // feb 9, mar, apr 10, may, jun 8, jul 7, aug, sept, oct 10, nov 8
+                    Prescribed = row.Cells[7].Value.AsString().Value(),    // feb 10, mar, apr 11, may, jun 9, jul 8, aug, sept, oct 11, nov 9
+                    BalanceInput = row.Cells[8].Value.AsString().Value(),  // feb 11,  mar, apr 12, may, jun 10, jul 9, aug, sept, oct 12, nov 10
+                    BalanceTenancy = row.Cells[9].Value.AsString().Value(),// feb 12, mar, apr 13, may 11, jun 13, jul 10, aug, sept, oct 15, nov 13
+                    Penalties = row.Cells[10].Value.AsString().Value(),
+                    DebetDGI = row.Cells[11].Value.AsString().Value(),      // feb, mar empty, apr 15, may 13, jun 15, jul 12, aug, sept 17, oct 18, nov 15
+                    BalanceOutput = row.Cells[12].Value.AsString().Value(), // feb 14, mar 15, apr 16, may 14, jun 16, jul 13, aug, sept 18, oct 19, nov 16
                 });
             }
             return premises;

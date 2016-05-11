@@ -27,5 +27,7 @@ namespace SphinxTrigramAddressParser
         public string LivingArea { get; set; }
 
         public string BalanceTenancy { get; set; }
+
+        public string Penalties { get; set; }
     }
 }

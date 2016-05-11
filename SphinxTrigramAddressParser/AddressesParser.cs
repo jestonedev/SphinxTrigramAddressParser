@@ -138,16 +138,21 @@ namespace SphinxTrigramAddressParser
                 ChargingTenancy = premise.ChargingTenancy,
                 BalanceDGI = premise.BalanceDGI,
                 BalanceInput = premise.BalanceInput,
+                BalanceInputPenalties = premise.BalanceInputPenalties,
                 TransferBalance = premise.TransferBalance,
                 ChargingDGI = premise.ChargingDGI,
+                ChargingTotal = premise.ChargingTotal,
+                ChargingPenalties = premise.ChargingPenalties,
                 BalanceOutputTenancy = premise.BalanceOutputTenancy,
                 PaymentDGI = premise.PaymentDGI,
-                ChargingTotal = premise.ChargingTotal,
-                BalanceOutputTotal = premise.BalanceOutputTotal,
-                RecalcTenancy = premise.RecalcTenancy,
                 PaymentTenancy = premise.PaymentTenancy,
+                PaymentPenalties = premise.PaymentPenalties,
+                RecalcTenancy = premise.RecalcTenancy,
                 RecalcDGI = premise.RecalcDGI,
-                BalanceOutputDGI = premise.BalanceOutputDGI
+                RecalcPenalties = premise.RecalcPenalties,
+                BalanceOutputTotal = premise.BalanceOutputTotal,
+                BalanceOutputDGI = premise.BalanceOutputDGI,
+                BalanceOutputPenalties = premise.BalanceOutputPenalties
             };
         }
     }
