@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SphinxTrigramAddressParser", "SphinxTrigramAddressParser\SphinxTrigramAddressParser.csproj", "{F97BF614-DC50-4B23-B2D1-F64F4DD9B90A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{48AB04AF-1D2B-4DAB-9720-EB508419ED0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F97BF614-DC50-4B23-B2D1-F64F4DD9B90A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F97BF614-DC50-4B23-B2D1-F64F4DD9B90A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F97BF614-DC50-4B23-B2D1-F64F4DD9B90A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48AB04AF-1D2B-4DAB-9720-EB508419ED0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48AB04AF-1D2B-4DAB-9720-EB508419ED0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48AB04AF-1D2B-4DAB-9720-EB508419ED0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48AB04AF-1D2B-4DAB-9720-EB508419ED0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

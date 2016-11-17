@@ -2,7 +2,7 @@
 
 namespace SphinxTrigramAddressParser
 {
-    internal class ConsoleLogger : Logger
+    public class ConsoleLogger : Logger
     {
         public override void Write(string msg, MsgType msgType)
         {

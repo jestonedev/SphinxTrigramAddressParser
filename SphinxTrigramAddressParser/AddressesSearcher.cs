@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
 namespace SphinxTrigramAddressParser
@@ -85,6 +86,30 @@ namespace SphinxTrigramAddressParser
         {
             var query = "SELECT id_sub_premises FROM sub_premises WHERE id_premises = ? AND sub_premises_num = ?";
             var command = DbConnection.CreateCommand();
+            command.CommandText = query;
+            command.Parameters.Add(DbConnection.CreateParameter("id_premises", idPremise));
+            command.Parameters.Add(DbConnection.CreateParameter("sub_premises_num", subPremiseNumber));
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    return reader.GetInt32(0);
+                }
+            }
+            if (!Regex.IsMatch(subPremiseNumber, "[0-9]+") && !Regex.IsMatch(subPremiseNumber, "[А-Я]+"))
+                return null;
+            if (Regex.IsMatch(subPremiseNumber, "[0-9]+"))
+            {
+                query = @"SELECT id_sub_premises FROM sub_premises WHERE id_premises = ? AND 
+                                sub_premises_num = ELT(?,'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л',
+                                                            'М','Н','О','П','Р','С','Т','У','Ф','Х',
+                                                            'Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я')";
+            }
+            if (Regex.IsMatch(subPremiseNumber, "[А-Я]+"))
+            {
+                query = @"SELECT id_sub_premises FROM sub_premises WHERE id_premises = ? AND sub_premises_num = CAST(ORD(?)-53391 AS CHAR)";
+            }
+            command = DbConnection.CreateCommand();
             command.CommandText = query;
             command.Parameters.Add(DbConnection.CreateParameter("id_premises", idPremise));
             command.Parameters.Add(DbConnection.CreateParameter("sub_premises_num", subPremiseNumber));

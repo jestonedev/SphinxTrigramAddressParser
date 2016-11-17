@@ -2,7 +2,7 @@
 
 namespace SphinxTrigramAddressParser
 {
-    internal class Premise
+    public class Premise
     {
         public string RawAddress { get; set; }
         public List<int?> IdPremisesList { get; set; }  // Finded duplicates premises

@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace SphinxTrigramAddressParser
 {
-    internal class AddressesParser
+    public class AddressesParser
     {
         public List<List<List<Premise>>> PreparedPremises { get; set; }
         public List<List<List<Premise>>> InvalidPremises { get; set; }
@@ -29,9 +29,9 @@ namespace SphinxTrigramAddressParser
 
         private static List<List<Premise>> ParseRawAddress(Premise premiseAddress)
         {
-            const string regExpression = @"^(?:ул\.?[ ]+|пер\.?[ ]+|пр-кт\.?[ ]+|бул\.?[ ]+|б-р\.?[ ]+|проезд\.?[ ]+)?(.*?)(?:[ ]+ул\.?|[ ]+пер\.?|[ ]+пр-кт\.?|[ ]+бул\.?|[ ]+б-р\.?|[ ]+проезд\.?)?(?:[ ]*,|,?[ ]*дом\.?|,?[ ]*д\.?)[ ]*([0-9]+[ ""\-]*[а-яА-Я]?[ ""\-]*(?:[ ]*[\/\\][ ]*[0-9]+[ ""\-]*[а-яА-Я]?[ ""\-]*)?).*?(?:,?[ ]*квартира\.?|,?[ ]*кв\.?[ ]*комн\.?|,?[ ]*кв\.?[ ]*ком\.?|,?[ ]*кв\.?[ ]*пом\.?|,?[ ]*кв\.?[ ]*к\.?|,?[ ]*кв\.?)[ ]*([0-9]+[ ]*[а-дА-Д]?(?:[ ]*(?:[ ]*-[ ]*|[ ]*,[ ]*|,?[ ]*квартира\.?|,?[ ]*кв\.?[ ]*комн\.?|,?[ ]*кв\.?[ ]*ком\.?|,?[ ]*кв\.?[ ]*пом\.?|,?[ ]*кв\.?[ ]*к\.?|,?[ ]*кв\.?)[ ]*(?:[0-9]+[ ]*[а-дА-Д]?))*).*?((?:\/|\\|,?[ ]*комната\.?|,?[ ]*ком\.?|,?[ ]*км\.?|,?[ ]*к\.?)[ ]*(?:[0-9а-яА-Я]+(?:[ ]*(?:,|,?[ ]*комната\.?|,?[ ]*ком\.?|,?[ ]*км\.?|,?[ ]*к\.?)[ ]*[0-9а-яА-Я]+)*))?[ ]*[з]?[ ]*\.?$";
-            var matches = Regex.Match(premiseAddress.RawAddress.ToLower(), regExpression);
-            if (matches.Length < 4)
+            const string regExpression = @"^(?:ул\.?[ ]+|пер\.?[ ]+|пр-кт\.?[ ]+|бул\.?[ ]+|б-р\.?[ ]+|проезд\.?[ ]+)?(.*?)(?:[ ]+ул\.?|[ ]+пер\.?|[ ]+пр-кт\.?|[ ]+бул\.?|[ ]+б-р\.?|[ ]+проезд\.?)?(?:[ ]*,|,?[ ]*дом\.?|,?[ ]*д\.?)[ ]*([0-9]+[ """"\-]*[а-яА-Я]?[ """"\-]*(?:[ ]*[\/\\][ ]*[0-9]+[ """"\-]*[а-яА-Я]?[ """"\-]*)?).*?(?:,?[ ]*квартира\.?|,?[ ]*кв\.?[ ]*комн\.?|,?[ ]*кв\.?[ ]*ком\.?|,?[ ]*кв\.?[ ]*пом\.?|,?[ ]*кв\.?[ ]*к\.?|,?[ ]*кв\.?)[ ]*([0-9]+[ ]*[а-дА-Д]?(?:[ ]*(?:[ ]*-[ ]*|[ ]*,[ ]*|,?[ ]*квартира\.?|,?[ ]*кв\.?[ ]*комн\.?|,?[ ]*кв\.?[ ]*ком\.?|,?[ ]*кв\.?[ ]*пом\.?|,?[ ]*кв\.?[ ]*к\.?|,?[ ]*кв\.?)[ ]*(?:[0-9]+[ ]*[а-дА-Д]?))*)(.*)$";
+            var matches = Regex.Match(premiseAddress.RawAddress.Trim().ToLower(), regExpression);
+            if (matches.Groups.Count < 4)
             {
                 var copyPremise = PartialCopyPremise(premiseAddress);
                 copyPremise.Description = "Invalid parse address";
@@ -46,14 +46,14 @@ namespace SphinxTrigramAddressParser
             var house = AddressHelper.NormalizeHouse(matches.Groups[2].Value);
             var premises = AddressHelper.NormalizePremises(matches.Groups[3].Value);
             string subPremises = null;
-            if (matches.Length > 4)
+            if (matches.Groups.Count > 4)
             {
                 subPremises = AddressHelper.NormalizeSubPremises(matches.Groups[4].Value);
                 subPremises = subPremises.Trim(',');
                 if (subPremises.StartsWith("/"))
                 {
                     sleshedRooms = true;
-                    subPremises = subPremises.Trim('/');
+                    subPremises = subPremises.Trim('/').Replace('/',',');
                 }
             }
             var addresses = new List<List<Premise>>();
@@ -81,19 +81,6 @@ namespace SphinxTrigramAddressParser
             }
             else
             {
-                var subPremisesList = subPremises.Split(new[] { ',' }, 2);
-                if (sleshedRooms)
-                {
-                    var newConcatedPremiseSubpremise = PartialCopyPremise(premiseAddress);
-                    newConcatedPremiseSubpremise.Street = street;
-                    newConcatedPremiseSubpremise.House = house;
-                    newConcatedPremiseSubpremise.PremiseNumber = premises + "," + subPremisesList[0];
-                    newConcatedPremiseSubpremise.SubPremises = subPremisesList.Count() == 2
-                        ? subPremisesList[1].Split(',').
-                            Select(subPremise => new SubPremise {SubPremiseNumber = subPremise}).ToList()
-                        : new List<SubPremise>();
-                    addresses.Add(new List<Premise> { newConcatedPremiseSubpremise });
-                }
                 var newAddress = PartialCopyPremise(premiseAddress);
                 newAddress.Street = street;
                 newAddress.House = house;
@@ -103,21 +90,40 @@ namespace SphinxTrigramAddressParser
                 foreach (var subPremise in subPremisesArray)
                     newAddress.SubPremises.Add(new SubPremise { SubPremiseNumber = subPremise });
                 addresses.Add(new List<Premise> { newAddress });
-                if (sleshedRooms && (subPremisesList.Length == 1))
+
+                var subPremisesList = subPremises.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (sleshedRooms && !Regex.IsMatch(subPremises, @"[А-Я](,[А-Я])*"))
                 {
-                    var premisesArray = (premises + "," + subPremisesList[0]).
-                        Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    var newAddressesList = new List<Premise>();
-                    foreach (var premise in premisesArray)
+                    for (var i = 1; i <= subPremisesList.Length; i++)
                     {
                         newAddress = PartialCopyPremise(premiseAddress);
                         newAddress.Street = street;
                         newAddress.House = house;
-                        newAddress.PremiseNumber = premise;
-                        newAddress.SubPremises = new List<SubPremise>();
-                        newAddressesList.Add(newAddress);
+                        newAddress.PremiseNumber = premises + "," +
+                                                    subPremisesList.Take(i).Aggregate((v, acc) => v + "," + acc);
+                        newAddress.SubPremises = subPremisesList.Length > 1
+                            ? subPremisesList.Skip(i)
+                                .Select(subPremise => new SubPremise {SubPremiseNumber = subPremise})
+                                .ToList()
+                            : new List<SubPremise>();
+                        addresses.Add(new List<Premise> {newAddress});
                     }
-                    addresses.Add(newAddressesList);
+                    if (subPremisesList.Length > 0)
+                    {
+                        var premisesArray = (premises + "," + subPremisesList.Aggregate((v, acc) => v + "," + acc)).
+                            Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                        var newAddressesList = new List<Premise>();
+                        foreach (var premise in premisesArray)
+                        {
+                            newAddress = PartialCopyPremise(premiseAddress);
+                            newAddress.Street = street;
+                            newAddress.House = house;
+                            newAddress.PremiseNumber = premise;
+                            newAddress.SubPremises = new List<SubPremise>();
+                            newAddressesList.Add(newAddress);
+                        }
+                        addresses.Add(newAddressesList);
+                    }
                 }
             }
             return addresses;

@@ -1,6 +1,6 @@
 ﻿namespace SphinxTrigramAddressParser
 {
-    internal enum MsgType
+    public enum MsgType
     {
         ErrorMsg, WarningMsg, InformationMsg
     }
