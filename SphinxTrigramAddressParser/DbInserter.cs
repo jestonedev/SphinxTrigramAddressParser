@@ -56,12 +56,21 @@ namespace SphinxTrigramAddressParser
                 InsertIntoDbTable("_invalid", invalidPremise[0]);
                 Logger.Write(string.Format("Insert invalid address `{0}`. Description: {1}", invalidPremise[0][0].RawAddress, invalidPremise[0][0].Description), MsgType.ErrorMsg);
             }
-            var errorCount = PostInsertIntoDb();
-            Logger.Write(string.Format("Inserted valid addresses count: {0}", preparedPremises.Count - invalidPremisesIds.Count - errorCount), MsgType.InformationMsg);
-            Logger.Write(string.Format("Inserted invalid addresses count: {0}", invalidPremises.Count + invalidPremisesIds.Count + errorCount), MsgType.InformationMsg);
+            PostInsertIntoDb();
+
+            var command = DbConnection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) as cnt FROM _invalid";
+            var invalidCount = command.ExecuteScalar();
+
+            command = DbConnection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) as cnt FROM _valid";
+            var validCount = command.ExecuteScalar();
+
+            Logger.Write(string.Format("Inserted valid addresses count: {0}", validCount), MsgType.InformationMsg);
+            Logger.Write(string.Format("Inserted invalid addresses count: {0}", invalidCount), MsgType.InformationMsg);
         }
 
-        private int PostInsertIntoDb()
+        private void PostInsertIntoDb()
         {
             var command = DbConnection.CreateCommand();
             Logger.Write("Copy incorrect resolved addresses from table _prevalid into table _invalid", MsgType.InformationMsg);
@@ -82,7 +91,7 @@ namespace SphinxTrigramAddressParser
                               LOCATE(' ', TRIM(SUBSTRING_INDEX(REPLACE(vks.street_name,'жилрайон. ',''),',',-1))))) AS street_name
                             FROM v_kladr_streets vks) x ON b.id_street = x.id_street
                             WHERE v.raw_address NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ'))";
-            var errorCount = command.ExecuteNonQuery();
+            command.ExecuteNonQuery();
             Logger.Write("Copy correct resolved addresses from table _prevalid into table _valid", MsgType.InformationMsg);
             command.CommandText =
                 @"INSERT INTO _valid
@@ -102,13 +111,6 @@ namespace SphinxTrigramAddressParser
                     FROM v_kladr_streets vks) x ON b.id_street = x.id_street
                     WHERE v.raw_address NOT LIKE REPLACE(CONCAT('%',x.street_name,'%'),'XX','ХХ'))";
             command.ExecuteNonQuery();
-            return errorCount;
-            /* Console.ForegroundColor = ConsoleColor.Yellow;
-            TODO: Console.Write("Are you sure, that you want execute stored procedure for inserting data into main table for selected? [yes/no]: ");
-            if (!(new List<string> { "Y", "YES", "1", "OK", "ДА" }).Contains((Console.ReadLine() ?? "").ToUpper())) return;
-            Console.ForegroundColor = ConsoleColor.Green;
-            TODO: Console.WriteLine("Execute stored procedure for inserting data into main table for selected period");
-            Console.ResetColor();*/
         }
 
         private void PreInitDb()

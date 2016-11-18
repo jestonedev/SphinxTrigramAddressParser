@@ -42,9 +42,10 @@ namespace SphinxTrigramAddressParser
 
         public static string NormalizeSubPremises(string subPremises)
         {
-            return Regex.Replace(Regex.Replace(subPremises, @"км[0-9]+[ ]*з?\.?$",",") /*убираем койко-место*/
+            return Regex.Replace(Regex.Replace(subPremises, @"к[/\\]?м[0-9]+[ ]*з?\.?$",",") /*убираем койко-место*/
                 .Replace("комната.", ",").Replace("комната", ",").Replace("ком.", ",").Replace("ком", ",")
-                .Replace("к.", ",").Replace("к", ",").Replace(" ", "").Replace("\\", "/").Replace(",,", ",").Trim(','),@"[зЗ]$", "").ToUpper();
+                .Replace("к.", ",").Replace("к", ",").Replace("-", ",").Replace(" ", "").Replace("\\", "/")
+                .Replace(",,", ",").Trim(','), @"[зЗ]\.?$", "").Trim().Trim(',').ToUpper();
         }
 
         public static bool IsValidAddress(IReadOnlyList<List<Premise>> address)
