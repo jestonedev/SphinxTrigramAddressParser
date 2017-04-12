@@ -41,7 +41,7 @@ namespace SphinxTrigramAddressParser
                 {
                     premise.Account = group.Account;
                     premise.RawAddress = group.RawAddress;
-                    premise.CRN = group.CRN;
+                    premise.Crn = group.CRN;
                     premise.Tenant = group.Tenant;
 
                     var account = group.Steps.Where(s => s.RawType == "Лицевой счет").ToList();
@@ -64,14 +64,18 @@ namespace SphinxTrigramAddressParser
                         var balanceInputFirst = balanceInput.First();
                         premise.BalanceInput = balanceInputFirst.BalanceInput;
                         premise.BalanceTenancy = balanceInputFirst.BalanceTenancy;
-                        premise.BalanceDGI = balanceInputFirst.DebetDGI;
+                        premise.BalanceDgi = balanceInputFirst.DzDgi;
+                        premise.BalancePadun = balanceInputFirst.DzPadun;
+                        premise.BalancePkk = balanceInputFirst.DzPkk;
                         premise.BalanceInputPenalties = balanceInputFirst.Penalties;
                     }
                     else
                     {
                         premise.BalanceInput = "0";
                         premise.BalanceTenancy = "0";
-                        premise.BalanceDGI = "0";
+                        premise.BalanceDgi = "0";
+                        premise.BalancePadun = "0";
+                        premise.BalancePkk = "0";
                         premise.BalanceInputPenalties = "0";
                     }
                     var charging = group.Steps.Where(s => s.RawType == "Начислено (расчет)").ToList();
@@ -91,25 +95,33 @@ namespace SphinxTrigramAddressParser
                     {
                         var chargingTotalFirst = chargingTotal.First();
                         premise.ChargingTotal = chargingTotalFirst.BalanceTenancy;
-                        premise.ChargingDGI = chargingTotalFirst.DebetDGI;
+                        premise.ChargingDgi = chargingTotalFirst.DzDgi;
+                        premise.ChargingPadun = chargingTotalFirst.DzPadun;
+                        premise.ChargingPkk = chargingTotalFirst.DzPkk;
                     }
                     else
                     {
                         premise.ChargingTotal = "0";
-                        premise.ChargingDGI = "0";
+                        premise.ChargingDgi = "0";
+                        premise.ChargingPadun = "0";
+                        premise.ChargingPkk = "0";
                     }
                     var recalc = group.Steps.Where(s => s.RawType == "Разовые (перерасчеты").ToList();
                     if (recalc.Any())
                     {
                         var recalcFirst = recalc.First();
                         premise.RecalcTenancy = recalcFirst.BalanceTenancy;
-                        premise.RecalcDGI = recalcFirst.DebetDGI;
+                        premise.RecalcDgi = recalcFirst.DzDgi;
+                        premise.RecalcPadun = recalcFirst.DzPadun;
+                        premise.RecalcPkk = recalcFirst.DzPkk;
                         premise.RecalcPenalties = recalcFirst.Penalties;
                     }
                     else
                     {
                         premise.RecalcTenancy = "0";
-                        premise.RecalcDGI = "0";
+                        premise.RecalcDgi = "0";
+                        premise.RecalcPadun = "0";
+                        premise.RecalcPkk = "0";
                         premise.RecalcPenalties = "0";
                     }
                     var payment = group.Steps.Where(s => s.RawType == "Оплачено").ToList();
@@ -117,13 +129,17 @@ namespace SphinxTrigramAddressParser
                     {
                         var paymentFirst = payment.First();
                         premise.PaymentTenancy = paymentFirst.BalanceTenancy;
-                        premise.PaymentDGI = paymentFirst.DebetDGI;
+                        premise.PaymentDgi = paymentFirst.DzDgi;
+                        premise.PaymentPadun = paymentFirst.DzPadun;
+                        premise.PaymentPkk = paymentFirst.DzPkk;
                         premise.PaymentPenalties = paymentFirst.Penalties;
                     }
                     else
                     {
                         premise.PaymentTenancy = "0";
-                        premise.PaymentDGI = "0";
+                        premise.PaymentDgi = "0";
+                        premise.PaymentPadun = "0";
+                        premise.PaymentPkk = "0";
                         premise.PaymentPenalties = "0";
                     }
                     var transferBalance = group.Steps.Where(s => s.RawType == "Перенос сальдо").ToList();
@@ -143,14 +159,18 @@ namespace SphinxTrigramAddressParser
                         var balanceOutputFirst = balanceOutput.First();
                         premise.BalanceOutputTotal = balanceOutputFirst.BalanceOutput;
                         premise.BalanceOutputTenancy = balanceOutputFirst.BalanceTenancy;
-                        premise.BalanceOutputDGI = balanceOutputFirst.DebetDGI;
+                        premise.BalanceOutputDgi = balanceOutputFirst.DzDgi;
+                        premise.BalanceOutputPadun = balanceOutputFirst.DzPadun;
+                        premise.BalanceOutputPkk = balanceOutputFirst.DzPkk;
                         premise.BalanceOutputPenalties = balanceOutputFirst.Penalties;
                     }
                     else
                     {
                         premise.BalanceOutputTotal = "0";
                         premise.BalanceOutputTenancy = "0";
-                        premise.BalanceOutputDGI = "0";
+                        premise.BalanceOutputDgi = "0";
+                        premise.BalanceOutputPadun = "0";
+                        premise.BalanceOutputPkk = "0";
                         premise.BalanceOutputPenalties = "0";
                     }
                     premises.Add(premise);
@@ -209,8 +229,10 @@ namespace SphinxTrigramAddressParser
                     BalanceInput = row.Cells[8].Value.AsString().Value(),  // feb 11,  mar, apr 12, may, jun 10, jul 9, aug, sept, oct 12, nov 10
                     BalanceTenancy = row.Cells[9].Value.AsString().Value(),// feb 12, mar, apr 13, may 11, jun 13, jul 10, aug, sept, oct 15, nov 13
                     Penalties = row.Cells[10].Value.AsString().Value(),
-                    DebetDGI = row.Cells[11].Value.AsString().Value(),      // feb, mar empty, apr 15, may 13, jun 15, jul 12, aug, sept 17, oct 18, nov 15
-                    BalanceOutput = row.Cells[12].Value.AsString().Value(), // feb 14, mar 15, apr 16, may 14, jun 16, jul 13, aug, sept 18, oct 19, nov 16
+                    BalanceOutput = row.Cells[11].Value.AsString().Value(), // feb 14, mar 15, apr 16, may 14, jun 16, jul 13, aug, sept 18, oct 19, nov 16
+                    DzPadun = row.Cells[12].Value.AsString().Value(),
+                    DzPkk = row.Cells[13].Value.AsString().Value(),
+                    DzDgi = row.Cells[14].Value.AsString().Value(),         // feb, mar empty, apr 15, may 13, jun 15, jul 12, aug, sept 17, oct 18, nov 15
                 });
             }
             return premises;

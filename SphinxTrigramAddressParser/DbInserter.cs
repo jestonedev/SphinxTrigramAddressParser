@@ -1,5 +1,4 @@
-﻿using System.CodeDom;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SphinxTrigramAddressParser
@@ -138,7 +137,16 @@ namespace SphinxTrigramAddressParser
         {
             foreach (var premise in premiseVariant)
             {
-                var query = string.Format("INSERT INTO {0} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
+                var query = string.Format("INSERT INTO {0} VALUES (" +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?," +
+                                          "?,?,?,?,?)", tableName);
                 var command = DbConnection.CreateCommand();
                 command.CommandText = query;
                 if (string.IsNullOrEmpty(premise.RawAddress)) continue;
@@ -165,29 +173,39 @@ namespace SphinxTrigramAddressParser
                 command.Parameters.Add(DbConnection.CreateParameter("subPremises", subPremises));
                 command.Parameters.Add(DbConnection.CreateParameter("account", premise.Account));
                 command.Parameters.Add(DbConnection.CreateParameter("description", premise.Description));
-                command.Parameters.Add(DbConnection.CreateParameter("crn", premise.CRN));
+                command.Parameters.Add(DbConnection.CreateParameter("crn", premise.Crn));
                 command.Parameters.Add(DbConnection.CreateParameter("tenant", premise.Tenant));
                 command.Parameters.Add(DbConnection.CreateParameter("prescribed", premise.Prescribed));
                 command.Parameters.Add(DbConnection.CreateParameter("total_area", premise.TotalArea));
                 command.Parameters.Add(DbConnection.CreateParameter("living_area", premise.LivingArea));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_input", premise.BalanceInput));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_tenancy", premise.BalanceTenancy));
-                command.Parameters.Add(DbConnection.CreateParameter("balance_dgi", premise.BalanceDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_dgi", premise.BalanceDgi));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_padun", premise.BalancePadun));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_pkk", premise.BalancePkk));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_input_penalties", premise.BalanceInputPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("charging_tenancy", premise.ChargingTenancy));
                 command.Parameters.Add(DbConnection.CreateParameter("charging_total", premise.ChargingTotal));
-                command.Parameters.Add(DbConnection.CreateParameter("charging_dgi", premise.ChargingDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_dgi", premise.ChargingDgi));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_padun", premise.ChargingPadun));
+                command.Parameters.Add(DbConnection.CreateParameter("charging_pkk", premise.ChargingPkk));
                 command.Parameters.Add(DbConnection.CreateParameter("charging_penalties", premise.ChargingPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("recalc_tenancy", premise.RecalcTenancy));
-                command.Parameters.Add(DbConnection.CreateParameter("recalc_dgi", premise.RecalcDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("recalc_dgi", premise.RecalcDgi));
+                command.Parameters.Add(DbConnection.CreateParameter("recalc_padun", premise.RecalcPadun));
+                command.Parameters.Add(DbConnection.CreateParameter("recalc_pkk", premise.RecalcPkk));
                 command.Parameters.Add(DbConnection.CreateParameter("recalc_penalties", premise.RecalcPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("payment_tenancy", premise.PaymentTenancy));
-                command.Parameters.Add(DbConnection.CreateParameter("payment_dgi", premise.PaymentDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("payment_dgi", premise.PaymentDgi));
+                command.Parameters.Add(DbConnection.CreateParameter("payment_padun", premise.PaymentPadun));
+                command.Parameters.Add(DbConnection.CreateParameter("payment_pkk", premise.PaymentPkk));
                 command.Parameters.Add(DbConnection.CreateParameter("payment_penalties", premise.PaymentPenalties));
                 command.Parameters.Add(DbConnection.CreateParameter("transfer_balance", premise.TransferBalance));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_total", premise.BalanceOutputTotal));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_tenancy", premise.BalanceOutputTenancy));
-                command.Parameters.Add(DbConnection.CreateParameter("balance_output_dgi", premise.BalanceOutputDGI));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_dgi", premise.BalanceOutputDgi));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_padun", premise.BalanceOutputPadun));
+                command.Parameters.Add(DbConnection.CreateParameter("balance_output_pkk", premise.BalanceOutputPkk));
                 command.Parameters.Add(DbConnection.CreateParameter("balance_output_penalties", premise.BalanceOutputPenalties));
                 command.ExecuteNonQuery();
                 IdKey++;
@@ -217,21 +235,31 @@ namespace SphinxTrigramAddressParser
                       "balance_input varchar(255) DEFAULT NULL, " +
                       "balance_tenancy varchar(255) DEFAULT NULL, " +
                       "balance_dgi varchar(255) DEFAULT NULL, " +
+                      "balance_padun varchar(255) DEFAULT NULL, " +
+                      "balance_pkk varchar(255) DEFAULT NULL, " +
                       "balance_input_penalties varchar(255) DEFAULT NULL, " +
                       "charging_tenancy varchar(255) DEFAULT NULL, " +
                       "charging_total varchar(255) DEFAULT NULL, " +
                       "charging_dgi varchar(255) DEFAULT NULL, " +
+                      "charging_padun varchar(255) DEFAULT NULL, " +
+                      "charging_pkk varchar(255) DEFAULT NULL, " +
                       "charging_penalties varchar(255) DEFAULT NULL, " +
                       "recalc_tenancy varchar(255) DEFAULT NULL, " +
                       "recalc_dgi varchar(255) DEFAULT NULL, " +
+                      "recalc_padun varchar(255) DEFAULT NULL, " +
+                      "recalc_pkk varchar(255) DEFAULT NULL, " +
                       "recalc_penalties varchar(255) DEFAULT NULL, " +
                       "payment_tenancy varchar(255) DEFAULT NULL, " +
                       "payment_dgi varchar(255) DEFAULT NULL, " +
+                      "payment_padun varchar(255) DEFAULT NULL, " +
+                      "payment_pkk varchar(255) DEFAULT NULL, " +
                       "payment_penalties varchar(255) DEFAULT NULL, " +
                       "transfer_balance varchar(255) DEFAULT NULL, " +
                       "balance_output_total varchar(255) DEFAULT NULL, " +
                       "balance_output_tenancy varchar(255) DEFAULT NULL, " +
                       "balance_output_dgi varchar(255) DEFAULT NULL, " +
+                      "balance_output_padun varchar(255) DEFAULT NULL, " +
+                      "balance_output_pkk varchar(255) DEFAULT NULL, " +
                       "balance_output_penalties varchar(255) DEFAULT NULL" +
                     ") "+
                     "ENGINE = INNODB "+
